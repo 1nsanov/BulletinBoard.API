@@ -1,4 +1,4 @@
-﻿namespace BulletinBoard.API.Models.Interfaces
+﻿namespace BulletinBoard.API.Controllers
 {
     public abstract class ControllerBase<T>
         where T : class

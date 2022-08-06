@@ -1,8 +1,7 @@
-﻿using BulletinBoard.API.Models;
-using BulletinBoard.API.Models.Interfaces;
+﻿using BulletinBoard.API.ExtensionClasses;
+using BulletinBoard.API.Models;
 using BulletinBoard.API.Models.Town;
 using BulletinBoard.API.Services;
-using Microsoft.AspNetCore.Mvc;
 
 namespace BulletinBoard.API.Controllers
 {
@@ -22,7 +21,7 @@ namespace BulletinBoard.API.Controllers
             }
             catch (Exception e)
             {
-                await SendError(ctx, e);
+                await SenderError.Error500(ctx, e);
             }
         }
 
@@ -40,7 +39,7 @@ namespace BulletinBoard.API.Controllers
             }
             catch (Exception e)
             {
-                await SendError(ctx, e);
+                await SenderError.Error500(ctx, e);
             }
         }
 
@@ -58,7 +57,7 @@ namespace BulletinBoard.API.Controllers
             }
             catch (Exception e)
             {
-                await SendError(ctx, e);
+                await SenderError.Error500(ctx, e);
             }
         }
 
@@ -76,15 +75,9 @@ namespace BulletinBoard.API.Controllers
             }
             catch (Exception e)
             {
-                await SendError(ctx, e);
+                await SenderError.Error500(ctx, e);
             }
 
-        }
-
-        private static async Task SendError(HttpContext ctx, Exception e)
-        {
-            ctx.Response.StatusCode = 500;
-            await ctx.Response.WriteAsJsonAsync(new BaseResponse(1, e.Message));
         }
     }
 }

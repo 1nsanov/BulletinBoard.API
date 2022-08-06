@@ -1,5 +1,4 @@
-﻿using BulletinBoard.API.Models.Interfaces;
-using BulletinBoard.API.Services;
+﻿using BulletinBoard.API.Services;
 
 namespace BulletinBoard.API.Controllers
 {

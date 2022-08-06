@@ -1,6 +1,4 @@
-﻿using BulletinBoard.API.Models.Interfaces;
-using BulletinBoard.API.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using BulletinBoard.API.Services;
 
 namespace BulletinBoard.API.Controllers
 {
