@@ -7,7 +7,9 @@ namespace BulletinBoard.API.Controllers
 {
     public class AuthController : ControllerBase<AuthService>
     {
-        public AuthController(AuthService service) : base(service) {}
+        public AuthController(AuthService service) : base(service)
+        {
+        }
 
         public async Task SingUp(HttpContext ctx)
         {
@@ -25,12 +27,44 @@ namespace BulletinBoard.API.Controllers
 
         public async Task SingIn(HttpContext ctx)
         {
+            try
+            {
+                var request = await ctx.Request.ReadFromJsonAsync<SingInRequest>();
+                var response = _service.SingIn(request);
+                await ctx.Response.WriteAsJsonAsync(response);
+            }
+            catch (Exception e)
+            {
+                await SenderError.Error500(ctx, e);
+            }
+        }
 
+        public async Task CheckExistUser(HttpContext ctx)
+        {
+            try
+            {
+                var request = await ctx.Request.ReadFromJsonAsync<CheckExistUserRequest>();
+                var response = _service.CheckExistUser(request);
+                await ctx.Response.WriteAsJsonAsync(response);
+            }
+            catch (Exception e)
+            {
+                await SenderError.Error500(ctx, e);
+            }
         }
 
         public async Task RecoveryPassword(HttpContext ctx)
         {
-
+            try
+            {
+                var request = await ctx.Request.ReadFromJsonAsync<RecoveryPasswordRequest>();
+                var response = _service.RecoveryPassword(request);
+                await ctx.Response.WriteAsJsonAsync(response);
+            }
+            catch (Exception e)
+            {
+                await SenderError.Error500(ctx, e);
+            }
         }
     }
 }

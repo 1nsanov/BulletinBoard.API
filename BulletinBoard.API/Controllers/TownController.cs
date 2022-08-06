@@ -1,5 +1,4 @@
 ﻿using BulletinBoard.API.ExtensionClasses;
-using BulletinBoard.API.Models;
 using BulletinBoard.API.Models.Town;
 using BulletinBoard.API.Services;
 
