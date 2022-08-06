@@ -14,7 +14,6 @@
             ParentIdCategory = parentIdCategory;
         }
 
-        public int AdvertisementId { get; set; }
-        public Advertisement? Advertisement { get; set; }
+        public List<Advertisement> Advertisements { get; set; } = new();
     }
 }

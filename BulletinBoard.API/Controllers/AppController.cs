@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using BulletinBoard.API.Models;
 using BulletinBoard.API.Services;
 
 namespace BulletinBoard.API.Controllers
@@ -10,14 +11,23 @@ namespace BulletinBoard.API.Controllers
         private const string AdvertisementUrl = "advertisement";
         private const string AuthUrl = "auth";
 
-        private static readonly TownController TownController = new();
-        private static readonly CategoryController CategoryController = new();
-        private static readonly AdvertisementController AdvertisementController = new();
-        private static readonly AuthController AuthController = new();
+        private readonly TownController TownController;
+        private readonly CategoryController CategoryController;
+        private readonly AdvertisementController AdvertisementController;
+        private readonly AuthController AuthController;
 
-        private static readonly DataSourceMethodsService DataSourceMethods = new();
+        private readonly DataSourceMethodsService DataSourceMethods;
 
-        public static Task Run(HttpContext ctx)
+        public AppController()
+        {
+            TownController = new TownController();
+            CategoryController = new CategoryController();
+            AdvertisementController = new AdvertisementController();
+            AuthController = new AuthController();
+            DataSourceMethods = new DataSourceMethodsService();
+        }
+
+        public async Task Run(HttpContext ctx)
         {
             var path = ctx.Request.Path;
             var nameService = GetNameFromPath(path, 1);
@@ -35,27 +45,29 @@ namespace BulletinBoard.API.Controllers
                 case AuthUrl:
                     AuthService(ctx);
                     break;
+                default:
+                    ctx.Response.StatusCode = 404;
+                    await ctx.Response.WriteAsJsonAsync(new BaseResponse(1, "Такого контроллера не существует"));
+                    break;
             }
-
-            return Task.CompletedTask;
         }
 
-        private static void TownService(HttpContext ctx)
+        private void TownService(HttpContext ctx)
         {
             Invoker(ctx, DataSourceMethods.TownMethodsList, TownController);
         }
 
-        private static void CategoryService(HttpContext ctx)
+        private void CategoryService(HttpContext ctx)
         {
             Invoker(ctx, DataSourceMethods.CategoryMethodsList, CategoryController);
         }
 
-        private static void AdvertisementService(HttpContext ctx)
+        private void AdvertisementService(HttpContext ctx)
         {
             Invoker(ctx, DataSourceMethods.AdvertisementMethodsList, AdvertisementController);
         }
 
-        private static void AuthService(HttpContext ctx)
+        private void AuthService(HttpContext ctx)
         {
             Invoker(ctx, DataSourceMethods.AuthMethodsList, AuthController);
         }
@@ -70,7 +82,7 @@ namespace BulletinBoard.API.Controllers
         /// <param name="listMethodInfo">Список методов контроллера</param>
         /// <param name="controller">контроллер</param>
         /// <exception cref="ArgumentNullException"></exception>
-        private static void Invoker<T>(HttpContext ctx, List<MethodInfo> listMethodInfo, T controller)
+        private void Invoker<T>(HttpContext ctx, List<MethodInfo> listMethodInfo, T controller)
             where T : class
         { 
             var nameMethod = GetNameFromPath(ctx.Request.Path, 2);
@@ -79,7 +91,7 @@ namespace BulletinBoard.API.Controllers
             else throw new ArgumentNullException("Такого метода не существует");
         }
 
-        private static string GetNameFromPath(PathString path, int index)
+        private string GetNameFromPath(PathString path, int index)
         {
             return path.Value.Split("/")[index];
         }

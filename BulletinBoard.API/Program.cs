@@ -9,6 +9,7 @@ app.UseCors(x => x
     .SetIsOriginAllowed(origin => true)
     .AllowCredentials());
 
-app.Run(async (ctx) => await AppController.Run(ctx));
+var appController = new AppController();
+app.Run(async (ctx) => await appController.Run(ctx));
 
 app.Run();

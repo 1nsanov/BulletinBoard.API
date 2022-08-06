@@ -10,7 +10,7 @@
         public DateTime CreatedDate { get; set; }
         public string? ImageUrl { get; set; }
 
-        public Advertisement(string title, string description, string phoneNumber, decimal price, DateTime createdDate, string? imageUrl)
+        public Advertisement(string title, string description, string phoneNumber, decimal price, DateTime createdDate, string? imageUrl, int userId, int categoryId, int townId)
         {
             Title = title;
             Description = description;
@@ -18,12 +18,18 @@
             Price = price;
             CreatedDate = createdDate;
             ImageUrl = imageUrl;
+            UserId = userId;
+            CategoryId = categoryId;
+            TownId = townId;
         }
 
         public int UserId { get; set; }
         public User? User { get; set; }
 
-        public List<Category> Categories { get; set; } = new();
-        public List<Town> Towns { get; set; } = new();
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+        public int TownId { get; set; }
+        public Town? Town { get; set; }
     }
 }
