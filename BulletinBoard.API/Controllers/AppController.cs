@@ -20,10 +20,10 @@ namespace BulletinBoard.API.Controllers
 
         public AppController()
         {
-            TownController = new TownController();
-            CategoryController = new CategoryController();
-            AdvertisementController = new AdvertisementController();
-            AuthController = new AuthController();
+            TownController = new TownController(new TownService());
+            CategoryController = new CategoryController(new CategoryService());
+            AdvertisementController = new AdvertisementController(new AdvertisementService());
+            AuthController = new AuthController(new AuthService());
             DataSourceMethods = new DataSourceMethodsService();
         }
 
@@ -84,7 +84,7 @@ namespace BulletinBoard.API.Controllers
         /// <exception cref="ArgumentNullException"></exception>
         private void Invoker<T>(HttpContext ctx, List<MethodInfo> listMethodInfo, T controller)
             where T : class
-        { 
+        {
             var nameMethod = GetNameFromPath(ctx.Request.Path, 2);
             var method = listMethodInfo.Find(item => item.Name == nameMethod);
             if (method != null) method.Invoke(controller, new object?[] { ctx });

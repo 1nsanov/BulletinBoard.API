@@ -6,8 +6,6 @@ namespace BulletinBoard.API.Services
 {
     public class TownService
     {
-        public readonly string test = "AAAAAAA";
-
         /// <summary>
         /// Получает список всех городов
         /// </summary>
