@@ -76,7 +76,7 @@ namespace BulletinBoard.API.Controllers
             var nameMethod = GetNameFromPath(ctx.Request.Path, 2);
             var method = listMethodInfo.Find(item => item.Name == nameMethod);
             if (method != null) method.Invoke(controller, new object?[] { ctx });
-            else throw new ArgumentNullException(nameof(method));
+            else throw new ArgumentNullException("Такого метода не существует");
         }
 
         private static string GetNameFromPath(PathString path, int index)
