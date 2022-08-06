@@ -9,6 +9,9 @@ namespace BulletinBoard.API.EntityDB
         private const string NameDb = "BulletinBoardDB";
 
         public DbSet<Town>? Towns { get; set; } = null!;
+        public DbSet<Category>? Categories { get; set; } = null!;
+        public DbSet<Advertisement>? Advertisements { get; set; } = null!;
+        public DbSet<User>? Users { get; set; } = null!;
 
         public DataBaseContext()
         {
