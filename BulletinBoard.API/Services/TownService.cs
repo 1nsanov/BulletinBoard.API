@@ -1,5 +1,6 @@
 ﻿using BulletinBoard.API.EntityDB;
 using BulletinBoard.API.EntityDB.Models;
+using BulletinBoard.API.Models;
 using BulletinBoard.API.Models.Town;
 
 namespace BulletinBoard.API.Services
@@ -11,7 +12,7 @@ namespace BulletinBoard.API.Services
         /// </summary>
         /// <returns></returns>
         /// <exception cref="ArgumentNullException"></exception>
-        public List<GetAllTownResponse>? GetAllTowns()
+        public BaseResponse<List<GetAllTownResponse>> GetAllTowns()
         {
             try
             {
@@ -19,7 +20,9 @@ namespace BulletinBoard.API.Services
                 var towns = db.Towns?.ToList();
                 var response = new List<GetAllTownResponse>();
                 towns.ForEach(item => response.Add(new GetAllTownResponse(item.Id, item.Name)));
-                return response;
+                return towns != null
+                    ? new BaseResponse<List<GetAllTownResponse>>(response)
+                    : new BaseResponse<List<GetAllTownResponse>>(1, "Города не найдены", response);
             }
             catch (Exception)
             {
@@ -27,7 +30,7 @@ namespace BulletinBoard.API.Services
             }
         }
 
-        public bool AddTown(string nameTown)
+        public BaseResponse AddTown(string nameTown)
         {
             try
             {
@@ -35,34 +38,34 @@ namespace BulletinBoard.API.Services
                 var newTown = new Town(nameTown);
                 db.Towns.Add(newTown);
                 db.SaveChanges();
-                return true;
+                return new BaseResponse(0);
             }
             catch (Exception)
             {
-                return false;
+                return new BaseResponse(1);
             }
 
         }
 
-        public bool UpdateTown(int id, string newNameTown)
+        public BaseResponse UpdateTown(int id, string newNameTown)
         {
             using var db = new DataBaseContext();
             var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
-            if (existTown == null) return false;
+            if (existTown == null) return new BaseResponse(1, "Город не найден");
             existTown.Name = newNameTown;
             db.Towns.Update(existTown);
             db.SaveChanges();
-            return true;
+            return new BaseResponse(0);
         }
 
-        public bool RemoveTown(int id)
+        public BaseResponse RemoveTown(int id)
         {
             using var db = new DataBaseContext();
             var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
-            if (existTown == null) return false;
+            if (existTown == null) return new BaseResponse(1, "Город не найден");
             db.Towns.Remove(existTown);
             db.SaveChanges();
-            return true;
+            return new BaseResponse(0);
         }
     }
 }

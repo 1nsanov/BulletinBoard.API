@@ -13,8 +13,9 @@ namespace BulletinBoard.API.Controllers
         {
             try
             {
-                var request = ctx.Request.ReadFromJsonAsync<SingUpRequest>();
-                
+                var request = await ctx.Request.ReadFromJsonAsync<SingUpRequest>();
+                var response = _service.SingUp(request);
+                await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
             {
