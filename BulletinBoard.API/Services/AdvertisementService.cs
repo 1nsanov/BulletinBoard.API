@@ -45,14 +45,14 @@ namespace BulletinBoard.API.Services
             {
                 using var db = new DataBaseContext();
                 var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
-                if (exist == null) new BaseResponse<AdvertisementItemDetailModel>(1, "Объявление не найдено", null);
+                if (exist == null) return new BaseResponse<AdvertisementItemDetailModel>(1, "Объявление не найдено", null);
 
                 var response = ConvertAdvertisementDetailItem(exist);
                 return new BaseResponse<AdvertisementItemDetailModel>(response);
             }
             catch (Exception e)
             {
-                return new BaseResponse<AdvertisementItemDetailModel>(1, e.Message, null);
+                return new BaseResponse<AdvertisementItemDetailModel>(1, e.Message);
             }
         }
 
