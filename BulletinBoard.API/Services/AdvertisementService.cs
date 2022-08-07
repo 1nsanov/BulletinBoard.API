@@ -7,7 +7,7 @@ namespace BulletinBoard.API.Services
 {
     public class AdvertisementService
     {
-        public BaseResponse<List<AdvertisementListItemModel>> GetListAdvertisement(GetListAdvertisementRequest request)
+        public BaseResponse<List<AdvertisementListItemModel>> GetAdvertisementList(GetAdvertisementListRequest request)
         {
             try
             {
@@ -62,7 +62,6 @@ namespace BulletinBoard.API.Services
             {
                 using var db = new DataBaseContext();
                 var dateNow = DateTime.Now;
-
                 var newAdvertisement = new Advertisement(request.Title, request.Description, request.PhoneNumber,
                     request.Price, dateNow, request.ImageUrl, request.UserId, request.CategoryId, request.TownId,
                     request.SubCategoryId);
@@ -77,7 +76,50 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        public BaseResponse UpdateAdvertisement(UpdateAdvertisementRequest request)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
+                if (exist == null) return new BaseResponse(1, "Объявление не найдено");
 
+                exist.Title = request.Title;
+                exist.Description = request.Description;
+                exist.PhoneNumber = request.PhoneNumber;
+                exist.ImageUrl = request.ImageUrl;
+                exist.Price = request.Price;
+                exist.TownId = request.TownId;
+                exist.CategoryId = request.CategoryId;
+                exist.SubCategoryId = request.SubCategoryId;
+
+                db.Advertisements.Update(exist);
+                db.SaveChanges();
+                return new BaseResponse(0);
+            }
+            catch (Exception e)
+            {
+                return new BaseResponse(1, e.Message);
+            }
+        }
+
+        public BaseResponse RemoveAdvertisement(RemoveAdvertisementRequest request)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
+                if (exist == null) return new BaseResponse(1, "Объявление не найдено");
+
+                db.Advertisements.Remove(exist);
+                db.SaveChanges();
+                return new BaseResponse(0);
+            }
+            catch (Exception e)
+            {
+                return new BaseResponse(1, e.Message);
+            }
+        }
 
         private static AdvertisementItemDetailModel ConvertAdvertisementDetailItem(Advertisement item)
         {
