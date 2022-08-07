@@ -9,6 +9,8 @@
         public decimal Price { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? ImageUrl { get; set; }
+        public int SubCategoryId { get; set; }
+
 
         public Advertisement(string title, string description, string phoneNumber, decimal price, DateTime createdDate, string? imageUrl, int userId, int categoryId, int townId, int subCategoryId)
         {
@@ -30,8 +32,7 @@
         public int CategoryId { get; set; }
         public Category? Category { get; set; }
 
-        public int SubCategoryId { get; set; }
-        public SubCategory? SubCategory { get; set; }
+        //public SubCategory? SubCategory { get; set; }
 
         public int TownId { get; set; }
         public Town? Town { get; set; }
