@@ -63,5 +63,6 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
+
     }
 }

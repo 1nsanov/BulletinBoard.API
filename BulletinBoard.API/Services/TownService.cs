@@ -20,13 +20,11 @@ namespace BulletinBoard.API.Services
                 var towns = db.Towns?.ToList();
                 var response = new List<GetAllTownResponse>();
                 towns.ForEach(item => response.Add(new GetAllTownResponse(item.Id, item.Name)));
-                return towns != null
-                    ? new BaseResponse<List<GetAllTownResponse>>(response)
-                    : new BaseResponse<List<GetAllTownResponse>>(1, "Города не найдены", response);
+                return new BaseResponse<List<GetAllTownResponse>>(response);
             }
             catch (Exception)
             {
-                throw new Exception();
+                return new BaseResponse<List<GetAllTownResponse>>(1, "Города не найдены", null);
             }
         }
 

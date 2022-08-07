@@ -10,6 +10,7 @@ namespace BulletinBoard.API.EntityDB
 
         public DbSet<Town>? Towns { get; set; } = null!;
         public DbSet<Category>? Categories { get; set; } = null!;
+        public DbSet<SubCategory> ? SubCategories { get; set; } = null!;
         public DbSet<Advertisement>? Advertisements { get; set; } = null!;
         public DbSet<User>? Users { get; set; } = null!;
 
