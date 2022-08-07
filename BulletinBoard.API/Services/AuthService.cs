@@ -9,8 +9,9 @@ namespace BulletinBoard.API.Services
     {
         public BaseResponse SingUp(SingUpRequest request)
         {
-            using var db = new DataBaseContext();
+            try
             {
+                using var db = new DataBaseContext();
                 var existUser = db.Users.FirstOrDefault(user => user.UserName == request.UserName);
                 if (existUser != null) return new BaseResponse(1, "Пользователь с таким логином уже существует");
 
@@ -21,34 +22,53 @@ namespace BulletinBoard.API.Services
                 db.SaveChanges();
                 return new BaseResponse(0);
             }
+            catch (Exception e)
+            {
+                return new BaseResponse(1, e.Message);
+            }
         }
 
-        public BaseResponse SingIn(SingInRequest request)
+        public BaseResponse<SingInResponse> SingIn(SingInRequest request)
         {
-            using var db = new DataBaseContext();
+            try
             {
+                using var db = new DataBaseContext();
                 var existUser = db.Users.FirstOrDefault(user => user.UserName == request.UserName);
-                if (existUser == null) return new BaseResponse(1, "Пользователя с таким логином не существует");
-                if (existUser.Password != request.Password) return new BaseResponse(1, "Не верный пароль, повторите попытку");
+                if (existUser == null) return new BaseResponse<SingInResponse>(1, "Пользователя с таким логином не существует");
+                if (existUser.Password != request.Password) return new BaseResponse<SingInResponse>(1, "Не верный пароль, повторите попытку");
 
-                return new BaseResponse(0);
+                var singInUser = new SingInResponse(existUser.Id, existUser.UserName, existUser.Password,
+                    existUser.UserRole);
+                return new BaseResponse<SingInResponse>(singInUser);
+            }
+            catch (Exception e)
+            {
+                return new BaseResponse<SingInResponse>(1, e.Message);
             }
         }
 
         public BaseResponse CheckExistUser(CheckExistUserRequest request)
         {
-            using var db = new DataBaseContext();
-            var existUser = db.Users.FirstOrDefault(user => user.UserName == request.UserName);
+            try
+            {
+                using var db = new DataBaseContext();
+                var existUser = db.Users.FirstOrDefault(user => user.UserName == request.UserName);
 
-            return existUser != null
-                ? new BaseResponse(0)
-                : new BaseResponse(1, "Пользователя с таким логином не существует");
+                return existUser != null
+                    ? new BaseResponse(0)
+                    : new BaseResponse(1, "Пользователя с таким логином не существует");
+            }
+            catch (Exception e)
+            {
+                return new BaseResponse(1, e.Message);
+            }
         }
 
         public BaseResponse RecoveryPassword(RecoveryPasswordRequest request)
         {
-            using var db = new DataBaseContext();
+            try
             {
+                using var db = new DataBaseContext();
                 var existUser = db.Users.FirstOrDefault(user => user.UserName == request.UserName);
                 if (existUser.Password == request.Password) return new BaseResponse(1, "Старый и новый пароли совпадают");
                 var valid = Validation(existUser.UserName, request.Password);
@@ -59,6 +79,11 @@ namespace BulletinBoard.API.Services
                 db.SaveChanges();
                 return new BaseResponse(0);
             }
+            catch (Exception e)
+            {
+                return new BaseResponse(1, e.Message);
+            }
+
         }
 
         private BaseResponse Validation(string userName, string password)
