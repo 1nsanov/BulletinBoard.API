@@ -33,6 +33,8 @@ namespace BulletinBoard.API.Services
             try
             {
                 using var db = new DataBaseContext();
+                var exist = db.Towns?.FirstOrDefault(item => item.Name == nameTown);
+                if (exist != null) return new BaseResponse(1, "Такой город уже существует");
                 var newTown = new Town(nameTown);
                 db.Towns.Add(newTown);
                 db.SaveChanges();
@@ -50,6 +52,9 @@ namespace BulletinBoard.API.Services
             using var db = new DataBaseContext();
             var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
             if (existTown == null) return new BaseResponse(1, "Город не найден");
+            var isFreeName = db.Towns.FirstOrDefault(x => x.Name == newNameTown);
+            if (isFreeName != null) return new BaseResponse(1, "Такой город уже существует");
+
             existTown.Name = newNameTown;
             db.Towns.Update(existTown);
             db.SaveChanges();
