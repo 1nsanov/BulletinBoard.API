@@ -8,6 +8,11 @@ namespace BulletinBoard.API.Controllers
     {
         public AdvertisementController(AdvertisementService service) : base(service) {}
 
+        /// <summary>
+        /// Отправляет список объявлений
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task GetAdvertisementList(HttpContext ctx)
         {
             try
@@ -21,6 +26,12 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
+
+        /// <summary>
+        /// Отправляет детальную информацию объявления
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task GetAdvertisementDetail(HttpContext ctx)
         {
             try
@@ -34,6 +45,12 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
+
+        /// <summary>
+        /// Создание объявления
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task CreateAdvertisement(HttpContext ctx)
         {
             try
@@ -47,6 +64,12 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
+
+        /// <summary>
+        /// Редактирование объявления
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task UpdateAdvertisement(HttpContext ctx)
         {
             try
@@ -60,6 +83,12 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
+
+        /// <summary>
+        /// Удалениие объявления
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task RemoveAdvertisement(HttpContext ctx)
         {
             try

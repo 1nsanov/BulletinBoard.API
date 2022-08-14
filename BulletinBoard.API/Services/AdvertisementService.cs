@@ -7,6 +7,11 @@ namespace BulletinBoard.API.Services
 {
     public class AdvertisementService
     {
+        /// <summary>
+        /// Получает список объявлений по фильтру (request)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse<List<AdvertisementListItemModel>> GetAdvertisementList(GetAdvertisementListRequest request)
         {
             try
@@ -38,7 +43,12 @@ namespace BulletinBoard.API.Services
                 return new BaseResponse<List<AdvertisementListItemModel>>(1, e.Message, null);
             }
         }
-
+        
+        /// <summary>
+        /// Получает детальную информацию о объявлении по id 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse<AdvertisementItemDetailModel> GetAdvertisementDetail(GetAdvertisementDetailRequest request)
         {
             try
@@ -63,6 +73,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Создает объявление
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse CreateAdvertisement(CreateAdvertisementRequest request)
         {
             try
@@ -83,6 +98,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Редактирует объявление
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse UpdateAdvertisement(UpdateAdvertisementRequest request)
         {
             try
@@ -110,6 +130,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Удаляет объявление
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse RemoveAdvertisement(RemoveAdvertisementRequest request)
         {
             try
@@ -128,12 +153,22 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Конвертер в детальную информацию объявления из БД
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private static AdvertisementItemDetailModel ConvertAdvertisementDetailItem(Advertisement item)
         {
             return new AdvertisementItemDetailModel(item.Id, item.Title, item.Description, item.PhoneNumber, item.Price, item.CreatedDate,
                 item.ImageUrl, item.CategoryId, null, item.SubCategoryId, null, item.TownId, null, item.UserId);
         }
 
+        /// <summary>
+        /// Конвертер в айтем списка объявления из БД
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private static AdvertisementListItemModel ConvertAdvertisementListItem(Advertisement item)
         {
             return new AdvertisementListItemModel(item.Id, item.Title, item.ImageUrl, item.Price);

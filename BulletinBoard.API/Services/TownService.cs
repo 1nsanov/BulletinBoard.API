@@ -28,6 +28,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Добавляет город
+        /// </summary>
+        /// <param name="nameTown"></param>
+        /// <returns></returns>
         public BaseResponse AddTown(string nameTown)
         {
             try
@@ -47,6 +52,12 @@ namespace BulletinBoard.API.Services
 
         }
 
+        /// <summary>
+        /// Редактирует город
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="newNameTown"></param>
+        /// <returns></returns>
         public BaseResponse UpdateTown(int id, string newNameTown)
         {
             using var db = new DataBaseContext();
@@ -61,6 +72,11 @@ namespace BulletinBoard.API.Services
             return new BaseResponse(0);
         }
 
+        /// <summary>
+        /// Удаляет город
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public BaseResponse RemoveTown(int id)
         {
             using var db = new DataBaseContext();

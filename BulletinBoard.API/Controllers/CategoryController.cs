@@ -8,6 +8,11 @@ namespace BulletinBoard.API.Controllers
     {
         public CategoryController(CategoryService service) : base(service){}
 
+        /// <summary>
+        /// Отправляет список категорий
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task GetAllCategory(HttpContext ctx)
         {
             try
@@ -22,6 +27,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Создание категории/подкатегории
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task CreateCategory(HttpContext ctx)
         {
             try
@@ -36,6 +46,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Редактирование категории/подкатегории
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task UpdateCategory(HttpContext ctx)
         {
             try
@@ -50,6 +65,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Удаление категории/подкатегории
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task RemoveCategory(HttpContext ctx)
         {
             try

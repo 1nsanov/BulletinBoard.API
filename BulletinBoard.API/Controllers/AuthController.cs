@@ -7,10 +7,13 @@ namespace BulletinBoard.API.Controllers
 {
     public class AuthController : ControllerBase<AuthService>
     {
-        public AuthController(AuthService service) : base(service)
-        {
-        }
+        public AuthController(AuthService service) : base(service){}
 
+        /// <summary>
+        /// Регистрация пользователя
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task SingUp(HttpContext ctx)
         {
             try
@@ -25,6 +28,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Авторизация пользователя
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task SingIn(HttpContext ctx)
         {
             try
@@ -39,6 +47,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Проверка на существования пользователя
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task CheckExistUser(HttpContext ctx)
         {
             try
@@ -53,6 +66,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Восстановление пароля
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task RecoveryPassword(HttpContext ctx)
         {
             try

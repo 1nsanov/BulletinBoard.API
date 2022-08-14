@@ -6,7 +6,11 @@ using BulletinBoard.API.Models.Category;
 namespace BulletinBoard.API.Services
 {
     public class CategoryService
-    {
+    {   
+        /// <summary>
+        /// Получает категории и подкатегории
+        /// </summary>
+        /// <returns></returns>
         public BaseResponse<List<GetAllCategoryResponse>> GetAllCategory()
         {
             try
@@ -30,6 +34,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Создает категорию/подкатегорию, для создания подкатегории необходимо указать id категории-родителя (ParentId)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse CreateCategory(CreateCategoryRequest request)
         {
             try
@@ -53,6 +62,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Редактирует категорию/подкатегорию
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse UpdateCategory(UpdateCategoryRequest request)
         {
             try
@@ -84,6 +98,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Удаляет категорию/подкатегорию
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse RemoveCategory(RemoveCategoryRequest request)
         {
             try

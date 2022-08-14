@@ -6,7 +6,12 @@ using BulletinBoard.API.Models.Auth;
 namespace BulletinBoard.API.Services
 {
     public class AuthService
-    {
+    {   
+        /// <summary>
+        /// Регистрация пользователя
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse SingUp(SingUpRequest request)
         {
             try
@@ -28,6 +33,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Авторизация пользователя
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse<SingInResponse> SingIn(SingInRequest request)
         {
             try
@@ -47,6 +57,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Проверка существования пользователя по логину
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse CheckExistUser(CheckExistUserRequest request)
         {
             try
@@ -64,6 +79,11 @@ namespace BulletinBoard.API.Services
             }
         }
 
+        /// <summary>
+        /// Восстановление пароля
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         public BaseResponse RecoveryPassword(RecoveryPasswordRequest request)
         {
             try

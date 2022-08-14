@@ -8,6 +8,11 @@ namespace BulletinBoard.API.Controllers
     {
         public TownController(TownService service) : base(service) {}
 
+        /// <summary>
+        /// Отправляет список городов
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task GetAllTown(HttpContext ctx)
         {
             try
@@ -21,6 +26,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Создание города
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task AddTown(HttpContext ctx)
         {
             try
@@ -36,6 +46,11 @@ namespace BulletinBoard.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Редактирование города
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task UpdateTown(HttpContext ctx)
         {
             try
@@ -49,7 +64,12 @@ namespace BulletinBoard.API.Controllers
                 await SenderError.Error500(ctx, e);
             }
         }
-
+        
+        /// <summary>
+        /// Удаление города
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns></returns>
         public async Task RemoveTown(HttpContext ctx)
         {
             try
