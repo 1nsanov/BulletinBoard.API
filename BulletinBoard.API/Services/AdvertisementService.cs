@@ -27,7 +27,7 @@ namespace BulletinBoard.API.Services
                     listAdvertisement = listAdvertisement.Where(item => item.SubCategoryId == request.SubCategoryId).ToList();
 
                 var response = listAdvertisement
-                    .OrderBy(x => x.CreatedDate)
+                    .OrderByDescending(x => x.CreatedDate)
                     .ToList()
                     .ConvertAll(ConvertAdvertisementListItem);
 
@@ -48,6 +48,13 @@ namespace BulletinBoard.API.Services
                 if (exist == null) return new BaseResponse<AdvertisementItemDetailModel>(1, "Объявление не найдено", null);
 
                 var response = ConvertAdvertisementDetailItem(exist);
+                response.CategoryName = db.Categories.FirstOrDefault(x => x.Id == response.CategoryId).Name;
+                response.TownName = db.Towns.FirstOrDefault(x => x.Id == response.TownId).Name;
+                if (response.SubCategoryId != null)
+                {
+                    response.SubCategoryName =
+                        db.SubCategories.FirstOrDefault(x => x.Id == response.SubCategoryId).Name;
+                }
                 return new BaseResponse<AdvertisementItemDetailModel>(response);
             }
             catch (Exception e)
@@ -124,7 +131,7 @@ namespace BulletinBoard.API.Services
         private static AdvertisementItemDetailModel ConvertAdvertisementDetailItem(Advertisement item)
         {
             return new AdvertisementItemDetailModel(item.Id, item.Title, item.Description, item.PhoneNumber, item.Price, item.CreatedDate,
-                item.ImageUrl);
+                item.ImageUrl, item.CategoryId, null, item.SubCategoryId, null, item.TownId, null, item.UserId);
         }
 
         private static AdvertisementListItemModel ConvertAdvertisementListItem(Advertisement item)
