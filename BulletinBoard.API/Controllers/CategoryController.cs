@@ -13,6 +13,7 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var response = _service.GetAllCategory();
+
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)

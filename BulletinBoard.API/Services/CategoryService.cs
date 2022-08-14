@@ -99,11 +99,16 @@ namespace BulletinBoard.API.Services
                     var isHaveSubCategory = db.SubCategories.FirstOrDefault(item => item.CategoryId == request.Id);
                     if (isHaveSubCategory != null) return new BaseResponse(1, "У категории есть подкатегории, удаление невозможно.");
 
+                    var advert = db.Advertisements.FirstOrDefault(x => x.CategoryId == existCategory.Id);
+                    if (advert != null) return new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
+
                     db.Categories.Remove(existCategory);
                     db.SaveChanges();
                 }
                 else
                 {
+                    var advert = db.Advertisements.FirstOrDefault(x => x.SubCategoryId == existSubCategory.Id);
+                    if (advert != null) return new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
                     db.SubCategories.Remove(existSubCategory);
                     db.SaveChanges();
                 }

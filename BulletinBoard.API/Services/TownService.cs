@@ -66,6 +66,10 @@ namespace BulletinBoard.API.Services
             using var db = new DataBaseContext();
             var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
             if (existTown == null) return new BaseResponse(1, "Город не найден");
+
+            var advert = db.Advertisements.FirstOrDefault(x => x.TownId == existTown.Id);
+            if (advert != null) return new BaseResponse(1, "К городу привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
+
             db.Towns.Remove(existTown);
             db.SaveChanges();
             return new BaseResponse(0);
