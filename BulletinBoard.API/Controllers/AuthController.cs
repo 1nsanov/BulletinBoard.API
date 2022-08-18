@@ -1,5 +1,5 @@
-﻿using BulletinBoard.API.EntityDB;
-using BulletinBoard.API.ExtensionClasses;
+﻿using BulletinBoard.API.ExtensionClasses;
+using BulletinBoard.API.Models;
 using BulletinBoard.API.Models.Auth;
 using BulletinBoard.API.Services;
 
@@ -7,7 +7,7 @@ namespace BulletinBoard.API.Controllers
 {
     public class AuthController : ControllerBase<AuthService>
     {
-        public AuthController(AuthService service) : base(service){}
+        public AuthController(AuthService service) : base(service) { }
 
         /// <summary>
         /// Регистрация пользователя
@@ -19,8 +19,20 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var request = await ctx.Request.ReadFromJsonAsync<SingUpRequest>();
-                var response = _service.SingUp(request);
-                await ctx.Response.WriteAsJsonAsync(response);
+                var response = new BaseResponse(1, "Пользователь с таким логином уже существует");
+                var existUser = _service.GetUserByUserName(request.UserName);
+                if (existUser == null)
+                {
+                    var validMsg = Validation(request.UserName, request.Password);
+                    if (validMsg.Length == 0)
+                    {
+                        _service.AddNewUser(request);
+                        response = new BaseResponse(0);
+                    }
+                    else response = new BaseResponse(1, validMsg);
+
+                    await ctx.Response.WriteAsJsonAsync(response);
+                }
             }
             catch (Exception e)
             {
@@ -38,7 +50,20 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var request = await ctx.Request.ReadFromJsonAsync<SingInRequest>();
-                var response = _service.SingIn(request);
+                var response = new BaseResponse<SingInResponse>(1, "Пользователя с таким логином не существует");
+                var existUser = _service.GetUserByUserName(request.UserName);
+                if (existUser != null)
+                {
+                    if (existUser.Password == request.Password)
+                    {
+                        response = new BaseResponse<SingInResponse>(new SingInResponse(existUser.Id, existUser.UserName,
+                            existUser.Password, existUser.UserRole));
+                    }
+                    else
+                    {
+                        response = new BaseResponse<SingInResponse>(1, "Не верный пароль, повторите попытку");
+                    }
+                }
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -57,7 +82,12 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var request = await ctx.Request.ReadFromJsonAsync<CheckExistUserRequest>();
-                var response = _service.CheckExistUser(request);
+                var response = new BaseResponse(0);
+                var isExistUser = _service.CheckExistUser(request.UserName);
+                if (!isExistUser)
+                {
+                    response = new BaseResponse(1, "Пользователя с таким логином не существует");
+                }
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -76,13 +106,31 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var request = await ctx.Request.ReadFromJsonAsync<RecoveryPasswordRequest>();
-                var response = _service.RecoveryPassword(request);
+                var response = new BaseResponse(0);
+                var existUser = _service.GetUserByUserName(request.UserName);
+                if (existUser.Password == request.Password)
+                {
+                    response = new BaseResponse(1, "Старый и новый пароли совпадают");
+                }
+                else
+                {
+                    var validMsg = Validation(existUser.UserName, existUser.Password);
+                    if (validMsg.Length != 0) response = new BaseResponse(1, validMsg);
+                    else _service.UpdatePassword(existUser.Id, request.Password);
+                }
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
             {
                 await SenderError.Error500(ctx, e);
             }
+        }
+
+        private string? Validation(string userName, string password)
+        {
+            if (userName.Length <= 2) return "Логин должен быть больше двух символов";
+            if (password.Length <= 3) return "Пароль должен быть не меньше четырех символов";
+            return string.Empty;
         }
     }
 }
