@@ -1,94 +1,121 @@
 ﻿using BulletinBoard.API.EntityDB;
 using BulletinBoard.API.EntityDB.Models;
-using BulletinBoard.API.Models;
-using BulletinBoard.API.Models.Town;
 
 namespace BulletinBoard.API.Services
 {
     public class TownService
     {
-        /// <summary>
-        /// Получает список всех городов
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public BaseResponse<List<GetAllTownResponse>> GetAllTowns()
+        public List<Town> GetTowns()
         {
             try
             {
                 using var db = new DataBaseContext();
-                var towns = db.Towns?.ToList();
-                var response = new List<GetAllTownResponse>();
-                towns.ForEach(item => response.Add(new GetAllTownResponse(item.Id, item.Name)));
-                return new BaseResponse<List<GetAllTownResponse>>(response);
+                return db.Towns?.ToList();
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return new BaseResponse<List<GetAllTownResponse>>(1, "Города не найдены", null);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Добавляет город
-        /// </summary>
-        /// <param name="nameTown"></param>
-        /// <returns></returns>
-        public BaseResponse AddTown(string nameTown)
+        public Town GetTown(int id)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var exist = db.Towns?.FirstOrDefault(item => item.Name == nameTown);
-                if (exist != null) return new BaseResponse(1, "Такой город уже существует");
-                var newTown = new Town(nameTown);
-                db.Towns.Add(newTown);
+                return db.Towns.FirstOrDefault(x => x.Id == id);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsExistTown(string name)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var town = db.Towns.FirstOrDefault(x => x.Name == name);
+                return town != null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsExistTown(int id)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var town = db.Towns.FirstOrDefault(x => x.Id == id);
+                return town != null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public void AddTown(string name)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                db.Towns.Add(new Town(name));
                 db.SaveChanges();
-                return new BaseResponse(0);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return new BaseResponse(1);
+                throw new Exception(e.Message);
             }
-
         }
 
-        /// <summary>
-        /// Редактирует город
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="newNameTown"></param>
-        /// <returns></returns>
-        public BaseResponse UpdateTown(int id, string newNameTown)
+        public void UpdateTown(int id, string name)
         {
-            using var db = new DataBaseContext();
-            var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
-            if (existTown == null) return new BaseResponse(1, "Город не найден");
-            var isFreeName = db.Towns.FirstOrDefault(x => x.Name == newNameTown);
-            if (isFreeName != null) return new BaseResponse(1, "Такой город уже существует");
-
-            existTown.Name = newNameTown;
-            db.Towns.Update(existTown);
-            db.SaveChanges();
-            return new BaseResponse(0);
+            try
+            {
+                var town = GetTown(id);
+                using var db = new DataBaseContext();
+                town.Name = name;
+                db.Towns.Update(town);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
 
-        /// <summary>
-        /// Удаляет город
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public BaseResponse RemoveTown(int id)
+        public void RemoveTown(int id)
         {
-            using var db = new DataBaseContext();
-            var existTown = db.Towns.FirstOrDefault(x => x.Id == id);
-            if (existTown == null) return new BaseResponse(1, "Город не найден");
+            try
+            {
+                using var db = new DataBaseContext();
+                var town = GetTown(id);
+                db.Towns.Remove(town);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
-            var advert = db.Advertisements.FirstOrDefault(x => x.TownId == existTown.Id);
-            if (advert != null) return new BaseResponse(1, "К городу привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
-
-            db.Towns.Remove(existTown);
-            db.SaveChanges();
-            return new BaseResponse(0);
+        public bool IsCanRemoveTown(int id)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var advert = db.Advertisements.FirstOrDefault(x => x.TownId == id);
+                return advert == null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
         }
     }
 }

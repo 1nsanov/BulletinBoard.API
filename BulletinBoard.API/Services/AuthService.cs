@@ -1,7 +1,5 @@
 ﻿using BulletinBoard.API.EntityDB;
 using BulletinBoard.API.EntityDB.Models;
-using BulletinBoard.API.Models;
-using BulletinBoard.API.Models.Auth;
 
 namespace BulletinBoard.API.Services
 {
@@ -12,7 +10,7 @@ namespace BulletinBoard.API.Services
             try
             {
                 using var db = new DataBaseContext();
-                return db.Users.FirstOrDefault(user => user.UserName == username);  
+                return db.Users.FirstOrDefault(user => user.UserName == username);
             }
             catch (Exception e)
             {
@@ -20,12 +18,12 @@ namespace BulletinBoard.API.Services
             }
         }
 
-        public void AddNewUser(SingUpRequest user)
+        public void AddNewUser(string username, string password)
         {
             try
             {
                 using var db = new DataBaseContext();
-                db.Users.Add(new User(user.UserName, user.Password, 0));
+                db.Users.Add(new User(username, password, 0));
                 db.SaveChanges();
             }
             catch (Exception e)

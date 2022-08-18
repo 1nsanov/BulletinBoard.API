@@ -26,7 +26,7 @@ namespace BulletinBoard.API.Controllers
                     var validMsg = Validation(request.UserName, request.Password);
                     if (validMsg.Length == 0)
                     {
-                        _service.AddNewUser(request);
+                        _service.AddNewUser(request.UserName, request.Password);
                         response = new BaseResponse(0);
                     }
                     else response = new BaseResponse(1, validMsg);
