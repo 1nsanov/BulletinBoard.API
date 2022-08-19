@@ -1,177 +1,116 @@
 ﻿using BulletinBoard.API.EntityDB;
 using BulletinBoard.API.EntityDB.Models;
-using BulletinBoard.API.Models;
-using BulletinBoard.API.Models.Advertisement;
 
 namespace BulletinBoard.API.Services
 {
     public class AdvertisementService
     {
-        /// <summary>
-        /// Получает список объявлений по фильтру (request)
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse<List<AdvertisementListItemModel>> GetAdvertisementList(GetAdvertisementListRequest request)
+        public List<Advertisement> GetAdvertisements()
         {
             try
             {
                 using var db = new DataBaseContext();
-                var listAdvertisement = db.Advertisements.ToList();
-
-                if (request.UserId != null)
-                    listAdvertisement = listAdvertisement.Where(item => item.UserId == request.UserId).ToList();
-
-                if (request.TownId != null)
-                    listAdvertisement = listAdvertisement.Where(item => item.TownId == request.TownId).ToList();
-
-                if (request.CategoryId != null)
-                    listAdvertisement = listAdvertisement.Where(item => item.CategoryId == request.CategoryId).ToList();
-
-                if (request.SubCategoryId != null)
-                    listAdvertisement = listAdvertisement.Where(item => item.SubCategoryId == request.SubCategoryId).ToList();
-
-                var response = listAdvertisement
-                    .OrderByDescending(x => x.CreatedDate)
-                    .ToList()
-                    .ConvertAll(ConvertAdvertisementListItem);
-
-                return new BaseResponse<List<AdvertisementListItemModel>>(response);
+                return db.Advertisements.ToList();
             }
             catch (Exception e)
             {
-                return new BaseResponse<List<AdvertisementListItemModel>>(1, e.Message, null);
+                throw new Exception(e.Message);
             }
         }
-        
-        /// <summary>
-        /// Получает детальную информацию о объявлении по id 
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse<AdvertisementItemDetailModel> GetAdvertisementDetail(GetAdvertisementDetailRequest request)
+
+        public Advertisement GetAdvertisement(int id)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
-                if (exist == null) return new BaseResponse<AdvertisementItemDetailModel>(1, "Объявление не найдено", null);
-
-                var response = ConvertAdvertisementDetailItem(exist);
-                response.CategoryName = db.Categories.FirstOrDefault(x => x.Id == response.CategoryId).Name;
-                response.TownName = db.Towns.FirstOrDefault(x => x.Id == response.TownId).Name;
-                if (response.SubCategoryId != null)
-                {
-                    response.SubCategoryName =
-                        db.SubCategories.FirstOrDefault(x => x.Id == response.SubCategoryId).Name;
-                }
-                return new BaseResponse<AdvertisementItemDetailModel>(response);
+                return db.Advertisements.FirstOrDefault(item => item.Id == id);
             }
             catch (Exception e)
             {
-                return new BaseResponse<AdvertisementItemDetailModel>(1, e.Message);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Создает объявление
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse CreateAdvertisement(CreateAdvertisementRequest request)
+        public string GetNameCategory(int id)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var dateNow = DateTime.Now;
-                var newAdvertisement = new Advertisement(request.Title, request.Description, request.PhoneNumber,
-                    request.Price, dateNow, request.ImageUrl, request.UserId, request.CategoryId, request.TownId,
-                    request.SubCategoryId);
+                return db.Categories.FirstOrDefault(x => x.Id == id).Name;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
 
-                db.Advertisements.Add(newAdvertisement);
+        public string GetNameSubCategory(int id)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                return db.SubCategories.FirstOrDefault(x => x.Id == id).Name;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public string GetNameTown(int id)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                return db.Towns.FirstOrDefault(x => x.Id == id).Name;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public void AddAdvertisement(Advertisement advertisement)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                db.Advertisements.Add(advertisement);
                 db.SaveChanges();
-                return new BaseResponse(0);
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Редактирует объявление
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse UpdateAdvertisement(UpdateAdvertisementRequest request)
+        public void UpdateAdvertisement(Advertisement advertisement)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
-                if (exist == null) return new BaseResponse(1, "Объявление не найдено");
-
-                exist.Title = request.Title;
-                exist.Description = request.Description;
-                exist.PhoneNumber = request.PhoneNumber;
-                exist.ImageUrl = request.ImageUrl;
-                exist.Price = request.Price;
-                exist.TownId = request.TownId;
-                exist.CategoryId = request.CategoryId;
-                exist.SubCategoryId = request.SubCategoryId;
-
-                db.Advertisements.Update(exist);
+                db.Advertisements.Update(advertisement);
                 db.SaveChanges();
-                return new BaseResponse(0);
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Удаляет объявление
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse RemoveAdvertisement(RemoveAdvertisementRequest request)
+        public void RemoveAdvertisement(int id)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var exist = db.Advertisements.FirstOrDefault(item => item.Id == request.Id);
-                if (exist == null) return new BaseResponse(1, "Объявление не найдено");
-
-                db.Advertisements.Remove(exist);
+                var advert = db.Advertisements.FirstOrDefault(x => x.Id == id);
+                db.Advertisements.Remove(advert);
                 db.SaveChanges();
-                return new BaseResponse(0);
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
             }
-        }
-
-        /// <summary>
-        /// Конвертер в детальную информацию объявления из БД
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        private static AdvertisementItemDetailModel ConvertAdvertisementDetailItem(Advertisement item)
-        {
-            return new AdvertisementItemDetailModel(item.Id, item.Title, item.Description, item.PhoneNumber, item.Price, item.CreatedDate,
-                item.ImageUrl, item.CategoryId, null, item.SubCategoryId, null, item.TownId, null, item.UserId);
-        }
-
-        /// <summary>
-        /// Конвертер в айтем списка объявления из БД
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        private static AdvertisementListItemModel ConvertAdvertisementListItem(Advertisement item)
-        {
-            return new AdvertisementListItemModel(item.Id, item.Title, item.ImageUrl, item.Price);
         }
     }
 }

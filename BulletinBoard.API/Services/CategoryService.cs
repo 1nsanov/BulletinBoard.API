@@ -1,7 +1,5 @@
 ﻿using BulletinBoard.API.EntityDB;
 using BulletinBoard.API.EntityDB.Models;
-using BulletinBoard.API.Models;
-using BulletinBoard.API.Models.Category;
 
 namespace BulletinBoard.API.Services
 {
