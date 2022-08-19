@@ -6,137 +6,170 @@ using BulletinBoard.API.Models.Category;
 namespace BulletinBoard.API.Services
 {
     public class CategoryService
-    {   
-        /// <summary>
-        /// Получает категории и подкатегории
-        /// </summary>
-        /// <returns></returns>
-        public BaseResponse<List<GetAllCategoryResponse>> GetAllCategory()
+    {
+        public List<Category> GetCategories()
         {
             try
             {
                 using var db = new DataBaseContext();
-                var categories = db.Categories.ToList();
-                var subCategory = db.SubCategories.ToList();
-                var response = new List<GetAllCategoryResponse>();
-
-                categories.ForEach(parent =>
-                {
-                    var subs = subCategory.Where(item => item.CategoryId == parent.Id).ToList();
-                    response.Add(new GetAllCategoryResponse(parent.Id, parent.Name, parent.ImageUrl, subs.ConvertAll(x => new SubCategoryModel(x.Id, x.Name, x.ImageUrl))));
-                });
-
-                return new BaseResponse<List<GetAllCategoryResponse>>(response);
+                return db.Categories.ToList();
             }
             catch (Exception e)
             {
-                return new BaseResponse<List<GetAllCategoryResponse>>(1, e.Message, null);
+                throw new Exception(e.Message);
+            }
+        }
+        public List<SubCategory> GetSubCategories()
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                return db.SubCategories.ToList();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Создает категорию/подкатегорию, для создания подкатегории необходимо указать id категории-родителя (ParentId)
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse CreateCategory(CreateCategoryRequest request)
+        public void AddCategory(string name, string imgUrl)
         {
             try
             {
                 using var db = new DataBaseContext();
-                if (request.ParentId == null)
-                {
-                    db.Categories.Add(new Category(request.Name, request.ImageUrl));
-                    db.SaveChanges();
-                }
-                else
-                {
-                    db.SubCategories.Add(new SubCategory(request.Name, request.ImageUrl, (int)request.ParentId));
-                    db.SaveChanges();
-                }
-                return new BaseResponse(0);
+                db.Categories.Add(new Category(name, imgUrl));
+                db.SaveChanges();
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Редактирует категорию/подкатегорию
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse UpdateCategory(UpdateCategoryRequest request)
+        public void AddCategory(string name, string imgUrl, int parentId)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var existSubCategory = db.SubCategories.FirstOrDefault(item => item.Id == request.Id && item.CategoryId == request.ParentId);
-
-                if (existSubCategory == null)
-                {
-                    var existCategory = db.Categories.FirstOrDefault(item => item.Id == request.Id);
-                    if (existCategory == null) return new BaseResponse(1, "Такой категории не существует");
-                    existCategory.Name = request.Name;
-                    existCategory.ImageUrl = request.ImageUrl;
-                    db.Categories.Update(existCategory);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    existSubCategory.Name = request.Name;
-                    existSubCategory.ImageUrl = request.ImageUrl;
-                    db.SubCategories.Update(existSubCategory);
-                    db.SaveChanges();
-                }
-                return new BaseResponse(0);
+                db.SubCategories.Add(new SubCategory(name, imgUrl, parentId));
+                db.SaveChanges();
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
             }
         }
 
-        /// <summary>
-        /// Удаляет категорию/подкатегорию
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public BaseResponse RemoveCategory(RemoveCategoryRequest request)
+        public Category? GetCategoryById(int id)
         {
             try
             {
                 using var db = new DataBaseContext();
-                var existSubCategory = db.SubCategories.FirstOrDefault(item => item.Id == request.Id && item.CategoryId == request.ParentId);
-
-                if (existSubCategory == null)
-                {
-                    var existCategory = db.Categories.FirstOrDefault(item => item.Id == request.Id);
-                    if (existCategory == null) return new BaseResponse(1, "Такой категории не существует");
-
-                    var isHaveSubCategory = db.SubCategories.FirstOrDefault(item => item.CategoryId == request.Id);
-                    if (isHaveSubCategory != null) return new BaseResponse(1, "У категории есть подкатегории, удаление невозможно.");
-
-                    var advert = db.Advertisements.FirstOrDefault(x => x.CategoryId == existCategory.Id);
-                    if (advert != null) return new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
-
-                    db.Categories.Remove(existCategory);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    var advert = db.Advertisements.FirstOrDefault(x => x.SubCategoryId == existSubCategory.Id);
-                    if (advert != null) return new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
-                    db.SubCategories.Remove(existSubCategory);
-                    db.SaveChanges();
-                }
-
-                return new BaseResponse(0);
+                return db.Categories.FirstOrDefault(item => item.Id == id);
             }
             catch (Exception e)
             {
-                return new BaseResponse(1, e.Message);
+                throw new Exception(e.Message);
+            }
+        }
+
+        public SubCategory? GetSubCategoryById(int id, int? parentId)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                return db.SubCategories.FirstOrDefault(item => item.Id == id && item.CategoryId == parentId);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public void UpdateCategory(Category currentCategory, string newName, string newImgUrl)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                currentCategory.Name = newName;
+                currentCategory.ImageUrl = newImgUrl;
+                db.Categories.Update(currentCategory);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        public void UpdateCategory(SubCategory currentSubCategory, string newName, string newImgUrl)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                currentSubCategory.Name = newName;
+                currentSubCategory.ImageUrl = newImgUrl;
+                db.SubCategories.Update(currentSubCategory);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsHaveSubCategory(int id)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var item = db.SubCategories.FirstOrDefault(item => item.CategoryId == id);
+                return item != null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public bool IsHaveAdvertisement(int id, bool isSubCategory)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                var item = db.Advertisements.FirstOrDefault(x => isSubCategory ? x.SubCategoryId  == id : x.CategoryId == id);
+                return item != null;
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public void RemoveCategory(Category category)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                db.Categories.Remove(category);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public void RemoveCategory(SubCategory subCategory)
+        {
+            try
+            {
+                using var db = new DataBaseContext();
+                db.SubCategories.Remove(subCategory);
+                db.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }
