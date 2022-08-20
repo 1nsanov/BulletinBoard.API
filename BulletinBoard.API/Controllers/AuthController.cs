@@ -1,6 +1,7 @@
 ﻿using BulletinBoard.API.ExtensionClasses;
 using BulletinBoard.API.Models;
 using BulletinBoard.API.Models.Auth;
+using BulletinBoard.API.Models.Enum;
 using BulletinBoard.API.Services;
 
 namespace BulletinBoard.API.Controllers
@@ -50,18 +51,19 @@ namespace BulletinBoard.API.Controllers
             try
             {
                 var request = await ctx.Request.ReadFromJsonAsync<SingInRequest>();
-                var response = new BaseResponse<SingInResponse>(1, "Пользователя с таким логином не существует");
+                var response = new BaseResponse<UserModel>(1, "Пользователя с таким логином не существует");
                 var existUser = _service.GetUserByUserName(request.UserName);
                 if (existUser != null)
                 {
                     if (existUser.Password == request.Password)
                     {
-                        response = new BaseResponse<SingInResponse>(new SingInResponse(existUser.Id, existUser.UserName,
+                        response = new BaseResponse<UserModel>(new UserModel(existUser.Id, existUser.UserName,
                             existUser.Password, existUser.UserRole));
+                        if(existUser.UserRole == EnumUserRole.Admin) Identification.AddIdConnect(ctx.Connection.Id);
                     }
                     else
                     {
-                        response = new BaseResponse<SingInResponse>(1, "Не верный пароль, повторите попытку");
+                        response = new BaseResponse<UserModel>(1, "Не верный пароль, повторите попытку");
                     }
                 }
                 await ctx.Response.WriteAsJsonAsync(response);

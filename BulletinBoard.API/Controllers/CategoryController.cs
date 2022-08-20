@@ -47,8 +47,12 @@ namespace BulletinBoard.API.Controllers
             {
                 var request = await ctx.Request.ReadFromJsonAsync<CreateCategoryRequest>();
                 var response = new BaseResponse(0);
-                if (request.ParentId == null) _service.AddCategory(request.Name, request.ImageUrl);
-                else _service.AddCategory(request.Name, request.ImageUrl, (int)request.ParentId);
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать категории.");
+                else
+                {
+                    if (request.ParentId == null) _service.AddCategory(request.Name, request.ImageUrl);
+                    else _service.AddCategory(request.Name, request.ImageUrl, (int)request.ParentId);
+                }
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -68,14 +72,18 @@ namespace BulletinBoard.API.Controllers
             {
                 var request = await ctx.Request.ReadFromJsonAsync<UpdateCategoryRequest>();
                 var response = new BaseResponse(0);
-                var subCategory = _service.GetSubCategoryById(request.Id, request.ParentId);
-                if (subCategory == null)
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать категории.");
+                else
                 {
-                    var category = _service.GetCategoryById(request.Id);
-                    if (category == null) response = new BaseResponse(1, "Такой категории не существует");
-                    else _service.UpdateCategory(category, request.Name, request.ImageUrl);
+                    var subCategory = _service.GetSubCategoryById(request.Id, request.ParentId);
+                    if (subCategory == null)
+                    {
+                        var category = _service.GetCategoryById(request.Id);
+                        if (category == null) response = new BaseResponse(1, "Такой категории не существует");
+                        else _service.UpdateCategory(category, request.Name, request.ImageUrl);
+                    }
+                    else _service.UpdateCategory(subCategory, request.Name, request.ImageUrl);
                 }
-                else _service.UpdateCategory(subCategory, request.Name, request.ImageUrl);
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -95,32 +103,34 @@ namespace BulletinBoard.API.Controllers
             {
                 var request = await ctx.Request.ReadFromJsonAsync<RemoveCategoryRequest>();
                 var response = new BaseResponse(0);
-                var subCategory = _service.GetSubCategoryById(request.Id, request.ParentId);
-                if (subCategory == null)
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать категории.");
+                else
                 {
-                    var category = _service.GetCategoryById(request.Id);
-                    if (category == null) response = new BaseResponse(1, "Такой категории не существует");
-                    else if (_service.IsHaveSubCategory(category.Id))
+                    var subCategory = _service.GetSubCategoryById(request.Id, request.ParentId);
+                    if (subCategory == null)
                     {
-                        response = new BaseResponse(1, "У категории есть подкатегории, удаление невозможно.");
-                    }
-                    else if (_service.IsHaveAdvertisement(category.Id, false))
-                    {
-                        response = new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
+                        var category = _service.GetCategoryById(request.Id);
+                        if (category == null) response = new BaseResponse(1, "Такой категории не существует");
+                        else if (_service.IsHaveSubCategory(category.Id))
+                        {
+                            response = new BaseResponse(1, "У категории есть подкатегории, удаление невозможно.");
+                        }
+                        else if (_service.IsHaveAdvertisement(category.Id, false))
+                        {
+                            response = new BaseResponse(1, "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
+                        }
+                        else _service.RemoveCategory(category);
+
                     }
                     else
                     {
-                        _service.RemoveCategory(category);
+                        if (_service.IsHaveAdvertisement(subCategory.Id, true))
+                        {
+                            response = new BaseResponse(1,
+                                "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
+                        }
+                        else _service.RemoveCategory(subCategory);
                     }
-                }
-                else
-                {
-                    if (_service.IsHaveAdvertisement(subCategory.Id, true))
-                    {
-                        response = new BaseResponse(1,
-                            "К категории привязаны объявления. Для удаления необходимо удалить все привязаные объявления");
-                    }
-                    else _service.RemoveCategory(subCategory);
                 }
                 await ctx.Response.WriteAsJsonAsync(response);
             }

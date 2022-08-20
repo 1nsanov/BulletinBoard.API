@@ -113,19 +113,23 @@ namespace BulletinBoard.API.Controllers
                 var request = await ctx.Request.ReadFromJsonAsync<UpdateAdvertisementRequest>();
                 var response = new BaseResponse(0);
                 var advert = _service.GetAdvertisement(request.Id);
-                if (advert == null) response =new BaseResponse(1, "Объявление не найдено");
-                else
+                if (IsCanUpdate(request.UserId, advert.UserId, ctx.Connection.Id))
                 {
-                    advert.Title = request.Title;
-                    advert.Description = request.Description;
-                    advert.PhoneNumber = request.PhoneNumber;
-                    advert.ImageUrl = request.ImageUrl;
-                    advert.Price = request.Price;
-                    advert.TownId = request.TownId;
-                    advert.CategoryId = request.CategoryId;
-                    advert.SubCategoryId = request.SubCategoryId;
-                    _service.UpdateAdvertisement(advert);
+                    if (advert == null) response = new BaseResponse(1, "Объявление не найдено");
+                    else
+                    {
+                        advert.Title = request.Title;
+                        advert.Description = request.Description;
+                        advert.PhoneNumber = request.PhoneNumber;
+                        advert.ImageUrl = request.ImageUrl;
+                        advert.Price = request.Price;
+                        advert.TownId = request.TownId;
+                        advert.CategoryId = request.CategoryId;
+                        advert.SubCategoryId = request.SubCategoryId;
+                        _service.UpdateAdvertisement(advert);
+                    }
                 }
+                else response = new BaseResponse(1, "Отказно в доступе, объявление не ваше / вы не Админ");
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -146,8 +150,11 @@ namespace BulletinBoard.API.Controllers
                 var request = await ctx.Request.ReadFromJsonAsync<RemoveAdvertisementRequest>();
                 var response = new BaseResponse(0);
                 var advert = _service.GetAdvertisement(request.Id);
-                if (advert != null) _service.RemoveAdvertisement(advert.Id);
-                else response = new BaseResponse(1, "Объявление не найдено");
+                if (IsCanUpdate(request.UserId, advert.Id, ctx.Connection.Id))
+                {
+                    if (advert != null) _service.RemoveAdvertisement(advert.Id);
+                    else response = new BaseResponse(1, "Объявление не найдено");
+                }
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -176,6 +183,11 @@ namespace BulletinBoard.API.Controllers
         private static AdvertisementListItemModel ConvertAdvertisementListItem(Advertisement item)
         {
             return new AdvertisementListItemModel(item.Id, item.Title, item.ImageUrl, item.Price);
+        }
+
+        private static bool IsCanUpdate(int userId, int advertUserId, string connectionId)
+        {
+            return Identification.IsAdmin(connectionId) || userId == advertUserId;
         }
     }
 }

@@ -41,8 +41,12 @@ namespace BulletinBoard.API.Controllers
                 var request = await ctx.Request.ReadFromJsonAsync<AddTownRequest>();
                 var response = new BaseResponse(0);
 
-                if (!_service.IsExistTown(request.Name)) _service.AddTown(request.Name);
-                else response = new BaseResponse(1, "Такой город уже существует");
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать города.");
+                else
+                {
+                    if (!_service.IsExistTown(request.Name)) _service.AddTown(request.Name);
+                    else response = new BaseResponse(1, "Такой город уже существует");
+                }
 
                 await ctx.Response.WriteAsJsonAsync(response);
             }
@@ -63,18 +67,16 @@ namespace BulletinBoard.API.Controllers
             {
                 var request = await ctx.Request.ReadFromJsonAsync<UpdateTownRequest>();
                 var response = new BaseResponse(0);
-                if (_service.IsExistTown(request.Id))
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать города.");
+                else
                 {
-                    if (_service.IsExistTown(request.Name))
+                    if (_service.IsExistTown(request.Id))
                     {
-                        response = new BaseResponse(1, "Такой город уже существует");
+                        if (_service.IsExistTown(request.Name)) response = new BaseResponse(1, "Такой город уже существует");
+                        else _service.UpdateTown(request.Id, request.Name);
                     }
-                    else
-                    {
-                        _service.UpdateTown(request.Id, request.Name);
-                    }
+                    else response = new BaseResponse(1, "Город не найден");
                 }
-                else response = new BaseResponse(1, "Город не найден");
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
@@ -94,12 +96,16 @@ namespace BulletinBoard.API.Controllers
             {
                 var request = await ctx.Request.ReadFromJsonAsync<RemoveTownRequest>();
                 var response = new BaseResponse(0);
-                if (_service.IsExistTown(request.Id))
+                if (!Identification.IsAdmin(ctx.Connection.Id)) response = new BaseResponse(1, "Только админ может редактировать города.");
+                else
                 {
-                    if (_service.IsCanRemoveTown(request.Id)) _service.RemoveTown(request.Id);
-                    else response = new BaseResponse(1, "К городу привязаны объявления. Для удаления необходимо удалить все привязаные объявления"); ;
+                    if (_service.IsExistTown(request.Id))
+                    {
+                        if (_service.IsCanRemoveTown(request.Id)) _service.RemoveTown(request.Id);
+                        else response = new BaseResponse(1, "К городу привязаны объявления. Для удаления необходимо удалить все привязаные объявления"); ;
+                    }
+                    else response = new BaseResponse(1, "Город не найден");
                 }
-                else response = new BaseResponse(1, "Город не найден");
                 await ctx.Response.WriteAsJsonAsync(response);
             }
             catch (Exception e)
